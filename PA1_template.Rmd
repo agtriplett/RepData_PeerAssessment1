@@ -1,12 +1,20 @@
 ---
-title: "Reproducible Research: Peer Assessment 1"
-output: 
+title: "Project 1"
+author: "Drew Triplett"
+date: "March 12, 2018"
+output:
+  md_document: default
   html_document:
     keep_md: true
+    
 ---
 
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
 
-## Loading and preprocessing the data
+#Load & Pre-Process Data
+
 1. Load the data
 2. Process/transform the data (if necessary) into a format suitable for your analysis
 
@@ -18,7 +26,9 @@ glimpse(dat)
 
   
 ```
-## What is mean total number of steps taken per day?
+
+#Step Patterns
+
 1. Calcualte the total number of steps taken per day
 2. Make a histogram of the total number of steps taken per day
 3. Calcaulate the mean and median of steps taken per day
@@ -32,7 +42,9 @@ median <- median(steps_by_day$steps)
 
 ```
  - The mean is r rmean and the median is `r median`.
-## What is the average daily activity pattern?
+
+#Daily Activity
+
 1. Make a time series plot of the 5 minute intervals of average steps taken averaged accross all days 
 2. White 5-minute interval, on average across all days, contains the maximum number of steps?
     It occurs around time interval 750
@@ -50,9 +62,7 @@ max_interval <- int_steps[which.max(int_steps$avg),1]
 
 The 5-minute interval, on average across all the days in the data set, containing the maximum number of steps is 835.
 
-
-
-## Imputing missing values
+#Impute Missing Values
 
 1. Calculate the number of missing values
 2. Devise a strategey for filling in the missing values in the dataset
@@ -69,7 +79,7 @@ int_steps <- dat %>%
   summarise(avg = mean(steps, na.rm = TRUE))
 
 data.i <- dat %>% 
-  mutate(steps = ifelse(is.na(dat$steps), int_steps$avg[match(dat$interval, int_steps$interval)], dat$steps))
+  mutate(steps = ifelse(is.na(dat$steps), int_steps$avg[match(dat$interval,int_steps$interval)], dat$steps))
 
 data.i[as.character(data.i$date) == "2012-10-01", 1] <- 0
 
@@ -100,7 +110,10 @@ total_diff <- sum(int_steps$total, na.rm = TRUE) - sum(int_steps.i$total)
 - The difference between the non-imputed mean and imputed mean is `r med_diff`
 - The difference between total number of steps between imputed and non-imputed data is `r total_diff`. Thus, there were `r total_diff` more steps in the imputed data.
 
-## Are there differences in activity patterns between weekdays and weekends?
+
+
+#Difference between Weekdays and Weekends
+
 1. Create a factor variable in the dataset with 2 levels, weekday and weekend indicating the day of the week
 2. Make a panel plot containing a time series plot by 5-minute interval of average number of steps taken across all weekday days and weekend days
 
@@ -111,8 +124,14 @@ data.i$dow <-  as.factor(ifelse(is.element(weekdays(as.Date(data.i$date)),weekda
 int_steps.i <-  data.i %>% 
   group_by(interval, dow) %>% 
   summarise(avg = mean(steps))
+
 library(lattice)
+
 xyplot(int_steps.i$avg ~ int_steps.i$interval|int_steps.i$dow, main="Average Steps per Day by Interval",xlab="Interval", ylab="Steps",layout=c(1,2), type="l")
 
+
+
 ```
+
+
 - Created a plot to compare and contrast number of steps between the week and weekend. There is a higher peak earlier on weekdays, and more overall activity on weekends.
